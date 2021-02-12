@@ -1,15 +1,13 @@
 <?php
 /**
- * Fuel
- *
- * Fuel is a fast, lightweight, community driven PHP5 framework.
+ * Fuel is a fast, lightweight, community driven PHP 5.4+ framework.
  *
  * @package    Fuel
- * @version    1.7
+ * @version    1.9-dev
  * @author     Fuel Development Team
  * @license    MIT License
- * @copyright  2010 - 2015 Fuel Development Team
- * @link       http://fuelphp.com
+ * @copyright  2010 - 2019 Fuel Development Team
+ * @link       https://fuelphp.com
  */
 
 namespace Email;
@@ -213,7 +211,7 @@ abstract class Email_Driver
 		// Check settings
 		$generate_alt = is_bool($generate_alt) ? $generate_alt : $this->config['generate_alt'];
 		$auto_attach = is_bool($auto_attach) ? $auto_attach : $this->config['auto_attach'];
-		$remove_html_comments = ! empty($this->config['remove_html_comments']) ? $this->config['remove_html_comments'] : true;
+		$remove_html_comments = isset($this->config['remove_html_comments']) ? (bool) $this->config['remove_html_comments'] : true;
 
 		// Remove html comments
 		if ($remove_html_comments)
@@ -599,7 +597,7 @@ abstract class Email_Driver
 		if ( ! isset($file[1]))
 		{
 			$name or $name = pathinfo($file[0], PATHINFO_BASENAME);
-			$file[] = $name;
+			$file[1] = $name;
 		}
 
 		// Find the attachment.
@@ -671,7 +669,7 @@ abstract class Email_Driver
 		$mime or $mime = static::attachment_mime($filename);
 
 		$this->attachments[$disp][$cid] = array(
-			'file' => array(1 => $filename),
+			'file' => array(0 => $filename, 1 => pathinfo($filename, PATHINFO_BASENAME)),
 			'contents' => static::encode_string($contents, 'base64', $this->config['newline']),
 			'mime' => $mime,
 			'disp' => $disp,
@@ -951,8 +949,20 @@ abstract class Email_Driver
 	 */
 	protected function encode_mimeheader($header)
 	{
+		// we need mbstring for this
+		if ( ! MBSTRING)
+		{
+			throw new \RuntimeException('Email requires the multibyte ("mbstring") package to be installed!');
+		}
+
+		// determine the transfer encoding to be used
 		$transfer_encoding = ($this->config['encoding'] === 'quoted-printable') ? 'Q' : 'B' ;
-		return mb_encode_mimeheader($header, $this->config['charset'], $transfer_encoding, $this->config['newline']);
+
+		// encode
+		$header = mb_encode_mimeheader($header, $this->config['charset'], $transfer_encoding, $this->config['newline']);
+
+		// and return it
+		return $header;
 	}
 
 	/**
@@ -1028,6 +1038,7 @@ abstract class Email_Driver
 			case 'html':
 				return 'text/html';
 			case 'html_alt_attach':
+			case 'html_inline_attach':
 			case 'html_alt_inline_attach':
 				return 'multipart/mixed; '.$boundary;
 			case 'html_alt_inline':

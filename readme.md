@@ -20,7 +20,7 @@ A full fledged email class for Fuel. Send mails using php's mail function, sendm
 	// Set with name
 	$mail->to('mail@domain.com', 'His/Her Name');
 	
-	// Set as arrau
+	// Set as array
 	$mail->to(array(
 		// Without name
 		'mail@domain.com',
@@ -142,7 +142,8 @@ return array(
 		'driver' => 'mailgun',
 		'mailgun' => array(
 			'key' => 'YOUR KEY',
-			'domain' => 'YOUR DOMAIN'
+			'domain' => 'YOUR DOMAIN',
+			'endpoint' => null | 'OPTIONAL ALT. API ENDPOINT URL' // e.g. 'https://api.eu.mailgun.net/v3'
 		),
 	),
 );

@@ -1,15 +1,13 @@
 <?php
 /**
- * Fuel
- *
- * Fuel is a fast, lightweight, community driven PHP5 framework.
+ * Fuel is a fast, lightweight, community driven PHP 5.4+ framework.
  *
  * @package    Fuel
- * @version    1.7
+ * @version    1.9-dev
  * @author     Fuel Development Team
  * @license    MIT License
- * @copyright  2010 - 2015 Fuel Development Team
- * @link       http://fuelphp.com
+ * @copyright  2010 - 2019 Fuel Development Team
+ * @link       https://fuelphp.com
  */
 
 /**
@@ -124,6 +122,8 @@ return array(
 			'password' => '',
 			'timeout'  => 5,
 			'starttls' => false,
+			'options'  => array(
+			),
 		),
 
 		/**
@@ -168,6 +168,7 @@ return array(
 		'mailgun' => array(
 			'key'    => 'api_key',
 			'domain' => 'domain',
+			'endpoint' => null // optional API URL; example: 'https://api.eu.mailgun.net/v3'; to use default, omit entirely or set to null
 		),
 
 		/**
